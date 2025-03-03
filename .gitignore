@@ -1,6 +1,8 @@
 __pycache__/
 *.log
+.myvenv/
 .venv/
 dataset/
 node_modules/
 .ipynb_checkpoints/
+wandb/
