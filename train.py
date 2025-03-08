@@ -176,7 +176,7 @@ def launch_sweep(entity, project):
     print(f"Sweep created with ID: {sweep_id}")
 
     # Launches an agent locally, calling train_sweep() for each hyperparameter set
-    wandb.agent(sweep_id, function=train_sweep, count=20)
+    wandb.agent(sweep_id, function=train_sweep, count=30)
 
 
 # 5) MAIN FUNCTION
@@ -199,11 +199,11 @@ def main():
         # Default hyperparameters
         wandb.config.update({
             "epochs": 10,
-            "lr": 0.0001,
+            "lr": 0.001,
             "num_hidden_layers": 3,
-            "hidden_size": 128,
-            "batch_size": 64,
-            "weight_decay": 0.0005,
+            "hidden_size": 32,
+            "batch_size": 16,
+            "weight_decay": 0,
             "optimizer": "nadam",
             "activation": "relu",
             "weight_init": "xavier"
