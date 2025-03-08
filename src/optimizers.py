@@ -17,9 +17,9 @@ class SGD:
 
 
 class Momentum:
-    def __init__(self, lr=0.01, beta=0.9):
+    def __init__(self, lr=0.01, momentum=0.9):
         self.lr = lr
-        self.beta = beta
+        self.momentum = momentum
         self.vW=[]
         self.vb=[]
         self.initialized = False
@@ -33,17 +33,17 @@ class Momentum:
 
         for i in range(len(model.layers)):
             W, b = model.layers[i]
-            self.vW[i] = self.beta*self.vW[i] + self.lr*dW_list[i]
-            self.vb[i] = self.beta*self.vb[i] + self.lr*db_list[i]
+            self.vW[i] = self.momentum*self.vW[i] + self.lr*dW_list[i]
+            self.vb[i] = self.momentum*self.vb[i] + self.lr*db_list[i]
 
             W-=self.vW[i]
             b-=self.vb[i]
             model.layers[i]=(W,b)
 
 class NAG:
-    def __init__(self, lr=0.01, beta=0.9):
+    def __init__(self, lr=0.01, momentum=0.9):
         self.lr = lr
-        self.beta = beta
+        self.momentum = momentum
         self.vW = []
         self.vb = []
         self.initialized = False
@@ -63,12 +63,12 @@ class NAG:
             vb_prev = self.vb[i].copy()
 
             # Update velocity
-            self.vW[i] = self.beta*self.vW[i] + self.lr*dW_list[i]
-            self.vb[i] = self.beta*self.vb[i] + self.lr*db_list[i]
+            self.vW[i] = self.momentum*self.vW[i] + self.lr*dW_list[i]
+            self.vb[i] = self.momentum*self.vb[i] + self.lr*db_list[i]
 
             # The Nesterov Lookahead step
-            W-=(self.beta*vW_prev + (1+self.beta)*self.vW[i])
-            b-=(self.beta*vb_prev + (1+self.beta)*self.vb[i])
+            W-=(self.momentum*vW_prev + (1+self.momentum)*self.vW[i])
+            b-=(self.momentum*vb_prev + (1+self.momentum)*self.vb[i])
 
             model.layers[i] = (W,b)
 

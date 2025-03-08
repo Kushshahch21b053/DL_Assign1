@@ -10,7 +10,7 @@ def forward_cache(model, X):
     z_list: List of pre-activations at each layer (z1, ..., zL)
     """
 
-    h_list = [X] # As h0 = imput
+    h_list = [X] # As h0 = input
     z_list = []
 
     out = X
@@ -19,7 +19,7 @@ def forward_cache(model, X):
         z_list.append(z)
 
         if i<len(model.layers) - 1:
-            out = np.maximum(0,z)
+            out = model.apply_activation(z, model.activation)
         else:
             exp_z = np.exp(z - np.max(z, axis=1, keepdims=True))
             out = exp_z / np.sum(exp_z, axis=1, keepdims=True)
@@ -39,11 +39,23 @@ def cross_entropy_loss(y_hat, y):
         Returns the average loss across the batch.
     """
     eps = 1e-9                                     # For epsilon smoothing to prevent log(0)
-    log_likelihood = -np.sum(y_hat + eps)
+    log_likelihood = -np.log(y_hat + eps)
     batch_loss = np.sum(y*log_likelihood, axis =1)
     return np.mean(batch_loss)
 
-def compute_gradients(model, X, y):
+def activation_derivative(z, activation):
+    if activation == "relu":
+        return(z>0).astype(float)
+    elif activation == "sigmoid":
+        g = 1/(1+np.exp(-z))
+        return g*(1-g)
+    elif activation == "tanh":
+        t=np.tanh(z)
+        return 1-t**2
+    else:
+        raise ValueError(f"Unsupported activation: {activation}")
+
+def compute_gradients(model, X, y, weight_decay=0.0):
     """
     Computes gradients of the loss w.r.t. each layer's W and b using backprop.
     The input parameters to the function are:
@@ -79,17 +91,21 @@ def compute_gradients(model, X, y):
         dW = np.dot(h_prev.T, dZ)/batch_size
         db = np.sum(dZ, axis=0, keepdims=True)/batch_size
 
+        # Add L2 regularization term (weight decay) to dW
+        if weight_decay > 0:
+            dW += weight_decay*W
+
         dW_list[i] = dW
         db_list[i] = db
 
         # Propogate the gradient backward except the first layer
-        if i>0:
+        if i > 0:
             dH_prev = np.dot(dZ, W.T)
 
-            # For ReLU activation, derivative is 1 if z>0, else 0
+            # Derivatiev of activation for layer i-1
             Z_prev = z_list[i-1]
-            relu_der = (Z_prev>0).astype(float)
-            dZ = dH_prev*relu_der
+            act_der = activation_derivative(Z_prev, model.activation)
+            dZ = dH_prev*act_der
     
     return dW_list, db_list
     
