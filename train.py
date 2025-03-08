@@ -196,16 +196,17 @@ def main():
     # To do single runs for testing and verifying
     if args.wandb_entity and args.wandb_project:
         wandb.init(entity=args.wandb_entity, project=args.wandb_project)
+        # Default hyperparameters
         wandb.config.update({
-            "epochs": 5,
-            "lr": 0.001,
+            "epochs": 10,
+            "lr": 0.0001,
             "num_hidden_layers": 3,
-            "hidden_size": 64,
-            "batch_size": 32,
-            "weight_decay": 0.0,
-            "optimizer": "sgd",
+            "hidden_size": 128,
+            "batch_size": 64,
+            "weight_decay": 0.0005,
+            "optimizer": "nadam",
             "activation": "relu",
-            "weight_init": "random"
+            "weight_init": "xavier"
         })
         train_sweep()
     else:
