@@ -6,3 +6,4 @@ dataset/
 node_modules/
 .ipynb_checkpoints/
 wandb/
+confusion_matrix.png

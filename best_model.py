@@ -6,9 +6,10 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.metrics import confusion_matrix
 import wandb
+import argparse
 
 from src.model import FNN
-from src.backprop import compute_gradients, cross_entropy_loss
+from src.backprop import compute_gradients, cross_entropy_loss, mse_loss
 from src.optimizers import SGD, Momentum, NAG, RMSProp, Adam, Nadam
 
 
@@ -51,13 +52,16 @@ def train_epoch(model, X_train, y_train, optimizer, batch_size, weight_decay):
         y_batch = y_train[batch_indices]
 
         dW_list, db_list = compute_gradients(
-            model, X_batch, y_batch, weight_decay=weight_decay
+            model, X_batch, y_batch, weight_decay=weight_decay, loss_type=wandb.config.loss_type
         )
         optimizer.update(model, dW_list, db_list)
 
 def evaluate(model, X, y):
     logits = model.forward(X)
-    loss = cross_entropy_loss(logits, y)
+    if wandb.config.loss_type == "mse":
+        loss = mse_loss(logits, y)
+    else:  # " Default loss_type is cross_entropy"
+        loss = cross_entropy_loss(logits, y)
     preds = np.argmax(logits, axis=1)
     labels = np.argmax(y, axis=1)
     accuracy = np.mean(preds == labels)
@@ -73,8 +77,8 @@ def plot_confusion_matrix(true_labels, pred_labels, class_names):
     plt.title("Confusion Matrix")
     return plt
 
-def test_best_model():
-    # 1. Hard-code for hyperparameters
+def test_best_model(loss_type):
+    # 1. Hard-code for best hyperparameters
     epochs = 10
     lr = 0.001
     num_hidden_layers = 3
@@ -95,7 +99,8 @@ def test_best_model():
         "weight_decay": weight_decay,
         "optimizer": optimizer_name,
         "activation": activation,
-        "weight_init": weight_init
+        "weight_init": weight_init,
+        "loss_type": loss_type
     })
 
     # 3. Building model
@@ -155,5 +160,13 @@ def test_best_model():
     plt_cm.show()
     wandb.log({"confusion_matrix": wandb.Image("confusion_matrix.png")})
 
+# The loss_type has been made command line configurable
+
 if __name__ == "__main__":
-    test_best_model()   
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--loss_type", default="cross_entropy")
+    args = parser.parse_args()
+
+    test_best_model(loss_type=args.loss_type)   

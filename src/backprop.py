@@ -43,6 +43,10 @@ def cross_entropy_loss(y_hat, y):
     batch_loss = np.sum(y*log_likelihood, axis =1)
     return np.mean(batch_loss)
 
+def mse_loss(y_hat, y):
+    sum = np.sum((y_hat - y)**2, axis=1)
+    return 0.5*np.mean(sum)
+
 def activation_derivative(z, activation):
     if activation == "relu":
         return(z>0).astype(float)
@@ -55,7 +59,7 @@ def activation_derivative(z, activation):
     else:
         raise ValueError(f"Unsupported activation: {activation}")
 
-def compute_gradients(model, X, y, weight_decay=0.0):
+def compute_gradients(model, X, y, weight_decay=0.0, loss_type="cross_entropy"):
     """
     Computes gradients of the loss w.r.t. each layer's W and b using backprop.
     The input parameters to the function are:
@@ -78,8 +82,13 @@ def compute_gradients(model, X, y, weight_decay=0.0):
     db_list = [None]*num_layers
 
     # Gradient of the cross entropy w.r.t. te=he final layer pre-activation
-    # For softmax + cross-entropy:
-    dZ = (y_hat - y) # shape: (batch_size, output_size)
+    if loss_type == "cross_entropy":
+        # For softmax + cross-entropy:
+        dZ = (y_hat - y) # shape: (batch_size, output_size)
+    elif loss_type == "mse":
+        dZ = (y_hat - y)  # It is non-standard to use mse with softmax, but can be done
+    else:
+        raise ValueError(f"Unknown loss_type: {loss_type}")
 
     # Backprop through each of the layers (L to 1)
     for i in reversed(range(num_layers)):
