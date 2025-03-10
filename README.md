@@ -1,5 +1,13 @@
 # DL_Assign1
 
+### Github link
+https://github.com/Kushshahch21b053/DL_Assign1
+
+
+### Report link
+https://wandb.ai/ch21b053-indian-institute-of-technology-madras/DL_Assign1/reports/CH21B053-A1-Report--VmlldzoxMTU0NDkyMA
+
+
 ### Code organisation
 
 src
@@ -17,7 +25,7 @@ mnist_q10.py
 ### How to train and evaluate
 
  - Question 1
-   To generate sample images we have to run python src/dataset.py if in the root directory
+   To generate sample images, we have to run python src/dataset.py if in the root directory
 
 - Questions 4,5,6
   To make the sweep and evaluate the models, the following line should be run in the command line
