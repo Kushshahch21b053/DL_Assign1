@@ -9,17 +9,19 @@ src
 - optimizers.py
 
 train.py
+
 best_model.py
+
 mnist_q10.py
 
 ### How to train and evaluate
 
  - Question 1
-   To genrate sample images we have to run python src/dataset.py if in the root directory
+   To generate sample images we have to run python src/dataset.py if in the root directory
 
-- Question 4,5,6
+- Questions 4,5,6
   To make the sweep and evaluate the models, the following line should be run in the command line
-  For question 4, 5 and 6 results the code can be run using python train.py --wandb_entity myname --wandb_project myprojectname     in the command line while in the root directory
+  For questions 4, 5 and 6, the code can be run using python train.py --wandb_entity myname --wandb_project myprojectname     in the command line while in the root directory
 
 - Question 7
   python best_model.py --loss_type cross_entropy     in the command line while in the root directory
